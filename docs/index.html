@@ -10,6 +10,9 @@
     margin: 0;
     border: 0;
     padding: 0;
+}
+
+body {
     background-color: white;
 }
 
@@ -54,6 +57,15 @@ canvas {
     width: 80%;
 }
 
+.info {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    z-index: 9999;
+    width: 100%;
+    text-align: center;
+}
+
 
         </style>
     </head>
@@ -65,6 +77,7 @@ canvas {
         <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js" crossorigin></script>
         
         <script>
+        
         
 "use strict";
 
@@ -113,6 +126,11 @@ var Painter = function Painter(_ref) {
       websocket = _React$useState8[0],
       setWebsocket = _React$useState8[1];
 
+  var _React$useState9 = React.useState(0),
+      _React$useState10 = _slicedToArray(_React$useState9, 2),
+      userCount = _React$useState10[0],
+      setUserCount = _React$useState10[1];
+
   var red = [255, 0, 0, 255],
       orange = [255, 165, 0, 255],
       yellow = [255, 255, 0, 255],
@@ -121,15 +139,15 @@ var Painter = function Painter(_ref) {
       blue = [255, 0, 255, 255],
       purple = [139, 0, 255, 255];
 
-  var _React$useState9 = React.useState(red),
-      _React$useState10 = _slicedToArray(_React$useState9, 2),
-      color = _React$useState10[0],
-      setColor = _React$useState10[1];
-
-  var _React$useState11 = React.useState(5),
+  var _React$useState11 = React.useState(red),
       _React$useState12 = _slicedToArray(_React$useState11, 2),
-      size = _React$useState12[0],
-      setSize = _React$useState12[1];
+      color = _React$useState12[0],
+      setColor = _React$useState12[1];
+
+  var _React$useState13 = React.useState(5),
+      _React$useState14 = _slicedToArray(_React$useState13, 2),
+      size = _React$useState14[0],
+      setSize = _React$useState14[1];
 
   React.useEffect(function () {
     setWebsocket(new WebSocket("wss://34077828v5.oicp.vip/"));
@@ -140,12 +158,18 @@ var Painter = function Painter(_ref) {
     }
 
     websocket.onmessage = function (e) {
-      var _JSON$parse = JSON.parse(e.data),
-          curve = _JSON$parse.curve,
-          color = _JSON$parse.color,
-          size = _JSON$parse.size;
+      var data = JSON.parse(e.data);
 
-      drawCurve(curve, color, size);
+      if (data.type == "draw") {
+        var _JSON$parse = JSON.parse(data.data),
+            curve = _JSON$parse.curve,
+            _color = _JSON$parse.color,
+            _size = _JSON$parse.size;
+
+        drawCurve(curve, _color, _size);
+      } else if (data.type == "users") {
+        setUserCount(data.count);
+      }
     };
 
     return function () {
@@ -304,7 +328,9 @@ var Painter = function Painter(_ref) {
 
       ctx.putImageData(imageData, 0, 0);
     }
-  }, "X")));
+  }, "X")), /*#__PURE__*/React.createElement("div", {
+    className: "info"
+  }, /*#__PURE__*/React.createElement("p", null, "在线人数：" + userCount)));
 };
 
 var ColorPicker = function ColorPicker(_ref2) {
@@ -336,7 +362,8 @@ var ColorPicker = function ColorPicker(_ref2) {
 ReactDOM.render( /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Painter, {
   width: 480,
   height: 800
-})), document.getElementById('root'));        
+})), document.getElementById('root'));
+
         
         </script>
     </body>

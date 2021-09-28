@@ -12,9 +12,10 @@ async def counter(websocket, path):
     try:
         print("connect")
         USERS.add(websocket)
+        websockets.broadcast(USERS, json.dumps({"type": "users", "count": len(USERS)}))
         async for message in websocket:
             print(message)
-            websockets.broadcast(USERS, message)
+            websockets.broadcast(USERS, json.dumps({"type": "draw", "data": message}))
     finally:
         USERS.remove(websocket)
 
